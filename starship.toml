@@ -1,0 +1,195 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# ───────────────────────────────────────────────────────────────
+#  Powerlevel10k "rainbow"-style: powerline, 1 line, compact.
+#  Left: OS · directory · Git
+#  Right: duration · languages
+#  Flat heads, flat tails.
+# ───────────────────────────────────────────────────────────────
+
+add_newline = false
+palette = 'p10k'
+
+format = """
+$os\
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$character"""
+
+right_format = """
+$cmd_duration\
+$nodejs\
+$bun\
+$python\
+$rust\
+$golang"""
+
+# ANSI 256 colors based on the original Powerlevel10k profile.
+[palettes.p10k]
+seg_fg = '0'
+os_bg = '236'
+os_fg = '39'
+dir_bg = '4'
+dir_fg = '254'
+git_bg = '2'
+git_dirty_bg = '3'
+
+# ── Left ───────────────────────────────────────────────────────
+
+[os]
+disabled = false
+format = '[ $symbol ](fg:os_fg bg:os_bg)'
+
+# Nerd Font glyphs per OS, borrowed from the official gruvbox-rainbow preset.
+# `Linux` is the generic fallback for distros without their own entry.
+[os.symbols]
+Arch = '󰣇'
+Artix = '󰣇'
+Ubuntu = '󰕈'
+Debian = '󰣚'
+Mint = '󰣭'
+Pop = ''
+Fedora = '󰣛'
+Redhat = '󱄛'
+RedHatEnterprise = '󱄛'
+CentOS = ''
+SUSE = ''
+Gentoo = '󰣨'
+Manjaro = ''
+EndeavourOS = ''
+Alpine = ''
+Raspbian = '󰐿'
+Amazon = ''
+Android = ''
+AOSC = ''
+Linux = '󰌽'
+Macos = '󰀵'
+Windows = '󰍲'
+
+[directory]
+format = '[](fg:os_bg bg:dir_bg)[ $path ](fg:dir_fg bg:dir_bg)'
+truncation_length = 3
+truncation_symbol = '…/'
+truncate_to_repo = true
+
+# ── Git branch ─────────────────────────────────────────────────
+
+[git_branch]
+# In detached HEAD mode, git_commit starts the Git segment instead.
+only_attached = true
+
+# Show the tracked remote branch only when it differs from the local branch.
+always_show_remote = false
+
+symbol = ''
+format = '[](fg:dir_bg bg:git_bg)[ $symbol $branch(:$remote_branch)](fg:seg_fg bg:git_bg)'
+
+# Prevent unusually long branch names from taking over the prompt.
+truncation_length = 32
+truncation_symbol = '…'
+
+# ── Detached commit and tag ────────────────────────────────────
+
+[git_commit]
+# Only show the commit hash when HEAD is detached.
+only_detached = true
+commit_hash_length = 7
+
+# Show a tag when HEAD points exactly to it.
+tag_disabled = false
+tag_max_candidates = 0
+tag_symbol = '  '
+
+format = '[](fg:dir_bg bg:git_bg)[  $hash$tag](fg:seg_fg bg:git_bg)'
+
+# ── Git operation in progress ──────────────────────────────────
+
+[git_state]
+# Show operations such as REBASE 3/10, MERGE or CHERRY-PICK.
+format = '[ $state( $progress_current/$progress_total)](bold fg:seg_fg bg:git_bg)'
+
+rebase = 'REBASE'
+merge = 'MERGE'
+revert = 'REVERT'
+cherry_pick = 'CHERRY-PICK'
+bisect = 'BISECT'
+am = 'AM'
+am_or_rebase = 'AM/REBASE'
+
+# ── Git line metrics ───────────────────────────────────────────
+
+[git_metrics]
+# Optional: show the number of added and deleted lines.
+# Set this to false if you want to enable the module.
+disabled = true
+only_nonzero_diffs = true
+
+format = '([ +$added]($added_style))([ -$deleted]($deleted_style))'
+added_style = 'fg:seg_fg bg:git_bg'
+deleted_style = 'fg:seg_fg bg:git_bg'
+
+# ── Git repository status ──────────────────────────────────────
+
+[git_status]
+# The entire group collapses when there is nothing to display.
+# Dirty or out-of-sync repositories get a yellow subsegment.
+format = '([](fg:git_bg bg:git_dirty_bg)[$all_status$ahead_behind](fg:seg_fg bg:git_dirty_bg))'
+
+conflicted = ' =${count}'
+ahead = ' ⇡${count}'
+behind = ' ⇣${count}'
+diverged = ' ⇕⇡${ahead_count}⇣${behind_count}'
+up_to_date = ''
+
+untracked = ' ?${count}'
+stashed = ' *${count}'
+modified = ' !${count}'
+staged = ' +${count}'
+renamed = ' »${count}'
+deleted = ' ✘${count}'
+typechanged = ' T${count}'
+
+# ── Prompt character ───────────────────────────────────────────
+
+[character]
+format = ' $symbol '
+success_symbol = '[❯](bold green)'
+error_symbol = '[❯](bold red)'
+vimcmd_symbol = '[❮](bold yellow)'
+
+# ── Right ──────────────────────────────────────────────────────
+
+[cmd_duration]
+min_time = 500
+format = '[󰔛 $duration ]($style)'
+style = 'yellow'
+
+[nodejs]
+format = '[$symbol$version ]($style)'
+symbol = ' '
+style = 'green'
+
+[bun]
+format = '[$symbol$version ]($style)'
+symbol = ' '
+style = 'white'
+
+[python]
+# Show the virtual environment name only when one is active.
+format = '[$symbol$version( \($virtualenv\)) ]($style)'
+symbol = ' '
+style = 'yellow'
+
+[rust]
+format = '[$symbol$version ]($style)'
+symbol = '󱘗 '
+style = 'red'
+
+[golang]
+format = '[$symbol$version ]($style)'
+symbol = ' '
+style = 'cyan'
