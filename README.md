@@ -1,5 +1,7 @@
 # starship-p10k-rainbow
 
+[![lint](https://github.com/carlosplanchon/starship-p10k-rainbow/actions/workflows/lint.yml/badge.svg)](https://github.com/carlosplanchon/starship-p10k-rainbow/actions/workflows/lint.yml)
+
 A [Starship](https://starship.rs) preset that recreates the
 [Powerlevel10k](https://github.com/romkatv/powerlevel10k) **"rainbow"** style:
 powerline segments, one line, compact. Works in any shell Starship supports;
