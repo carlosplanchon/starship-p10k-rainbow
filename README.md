@@ -1,6 +1,6 @@
 # starship-p10k-rainbow
 
-[![lint](https://github.com/carlosplanchon/starship-p10k-rainbow/actions/workflows/lint.yml/badge.svg)](https://github.com/carlosplanchon/starship-p10k-rainbow/actions/workflows/lint.yml)
+[![ci](https://github.com/carlosplanchon/starship-p10k-rainbow/actions/workflows/ci.yml/badge.svg)](https://github.com/carlosplanchon/starship-p10k-rainbow/actions/workflows/ci.yml)
 
 A [Starship](https://starship.rs) preset that recreates the
 [Powerlevel10k](https://github.com/romkatv/powerlevel10k) **"rainbow"** style:

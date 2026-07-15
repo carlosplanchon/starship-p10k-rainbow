@@ -1,0 +1,111 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      # install.sh is POSIX sh; regen.sh is bash (shellcheck reads its shebang).
+      - name: shellcheck
+        run: |
+          shellcheck -s sh install.sh
+          shellcheck screenshots/regen.sh
+
+      # Real run of the installer (including --install-starship), then the
+      # preset from THIS commit rendered against real git repo states. The
+      # installer itself downloads the published toml from main, so the
+      # render phase re-points STARSHIP_CONFIG at the workspace copy.
+      - name: installer and prompt smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export HOME="$RUNNER_TEMP/starship-home"
+          export PATH="$HOME/.local/bin:$PATH"
+          export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+
+          # Starship disables rendering when TERM=dumb.
+          export TERM=xterm-256color
+
+          mkdir -p "$(dirname "$STARSHIP_CONFIG")"
+          printf 'old = true\n' > "$STARSHIP_CONFIG"
+
+          # Exercise the real installer, including Starship installation.
+          sh ./install.sh --install-starship
+
+          command -v starship >/dev/null
+          test -s "$STARSHIP_CONFIG"
+
+          backup=$(find "$(dirname "$STARSHIP_CONFIG")" \
+            -maxdepth 1 -name 'starship.toml.bak.*' -print -quit)
+
+          test -n "$backup"
+          grep -Fq 'old = true' "$backup"
+
+          # From this point on, validate the config from this commit/PR.
+          export STARSHIP_CONFIG="$GITHUB_WORKSPACE/starship.toml"
+
+          render() {
+            local output=$1
+            shift
+            local errors="$output.err"
+
+            if ! STARSHIP_LOG=warn "$@" >"$output" 2>"$errors"; then
+              cat "$errors" >&2
+              return 1
+            fi
+
+            if [[ -s "$errors" ]]; then
+              cat "$errors" >&2
+              return 1
+            fi
+          }
+
+          # Parse and expand the complete configuration.
+          render "$HOME/config.out" starship print-config
+
+          # Build a disposable Git repository.
+          repo="$HOME/demo"
+          mkdir -p "$repo"
+          cd "$repo"
+
+          git init -q -b main
+          git config user.name CI
+          git config user.email ci@example.invalid
+
+          printf 'hello\n' > app.py
+          git add app.py
+          git commit -qm initial
+
+          # Clean repository.
+          render "$HOME/clean.prompt" starship prompt
+          grep -Fq main "$HOME/clean.prompt"
+
+          # Dirty repository.
+          printf 'dirty\n' >> app.py
+          render "$HOME/dirty.prompt" starship prompt
+          grep -Fq '!1' "$HOME/dirty.prompt"
+          ! cmp -s "$HOME/clean.prompt" "$HOME/dirty.prompt"
+
+          # Detached HEAD.
+          git checkout -q --detach
+          render "$HOME/detached.prompt" starship prompt
+          grep -Fq \
+            "$(git rev-parse --short=7 HEAD)" \
+            "$HOME/detached.prompt"
+
+          # Right prompt and command duration.
+          render "$HOME/right.prompt" \
+            starship prompt --right --cmd-duration=1000
+
+          test -s "$HOME/right.prompt"
