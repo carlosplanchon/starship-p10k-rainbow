@@ -117,6 +117,10 @@ are welcome.
 ## Related
 
 - [Powerlevel10k](https://github.com/romkatv/powerlevel10k): the original.
+- [zsh-classic-stack](https://github.com/carlosplanchon/zsh-classic-stack) and
+  [sway-workstation](https://github.com/carlosplanchon/sway-workstation): the
+  shell and the desktop around this prompt. Desktop, shell and prompt: the
+  three repos compose a terminal-first workstation.
 - Kindred official presets: [Pastel Powerline](https://starship.rs/presets/pastel-powerline),
   [Gruvbox Rainbow](https://starship.rs/presets/gruvbox-rainbow) (the OS icon
   table is borrowed from it).
