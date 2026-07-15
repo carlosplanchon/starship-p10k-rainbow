@@ -87,7 +87,8 @@ zsh-syntax-highlighting, zsh-completions) has its own repo:
 [zsh-classic-stack](https://github.com/carlosplanchon/zsh-classic-stack),
 a script that checks what you have, prints the install command and
 `~/.zshrc` line for your system, and can wire up the installed tools with
-`--enable`.
+`--enable`. Setting up both from scratch? The recommended order is the
+shell first, then this preset; its README has the two commands.
 
 ## Palette
 
