@@ -29,10 +29,13 @@ tails") as p10k's default rainbow profile.
   entirely when the repo is clean and in sync.
 - Optional **line metrics** (`+12 -3`): enable by setting
   `git_metrics.disabled = false`.
+- A **lock** in the directory segment when it is not writable.
 - `❯` turns red when the last command failed; `❮` in vi command mode.
 
-**Right side**: command duration (over 500 ms) and language versions:
-Node.js, Bun, Python (with the active virtualenv name), Rust, Go.
+**Right side**: exit status when the last command failed (code, signal name,
+per-pipe codes), command duration (over 500 ms), background jobs, a direnv
+chip, language versions — Node.js, Bun, Python (with the active virtualenv
+name), Rust, Go — and `user@host` on SSH or root sessions, hidden locally.
 
 | State | Screenshot |
 |---|---|

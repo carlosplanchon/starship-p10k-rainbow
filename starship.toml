@@ -3,7 +3,7 @@
 # ───────────────────────────────────────────────────────────────
 #  Powerlevel10k "rainbow"-style: powerline, 1 line, compact.
 #  Left: OS · directory · Git
-#  Right: duration · languages
+#  Right: exit status · duration · jobs · direnv · languages · user@host (SSH/root)
 #  Flat heads, flat tails.
 # ───────────────────────────────────────────────────────────────
 
@@ -21,12 +21,17 @@ $git_status\
 $character"""
 
 right_format = """
+$status\
 $cmd_duration\
+$jobs\
+$direnv\
 $nodejs\
 $bun\
 $python\
 $rust\
-$golang"""
+$golang\
+$username\
+$hostname"""
 
 # ANSI 256 colors based on the original Powerlevel10k profile.
 [palettes.p10k]
@@ -71,10 +76,15 @@ Macos = '󰀵'
 Windows = '󰍲'
 
 [directory]
-format = '[](fg:os_bg bg:dir_bg)[ $path ](fg:dir_fg bg:dir_bg)'
+format = '[](fg:os_bg bg:dir_bg)[ $path ](fg:dir_fg bg:dir_bg)([$read_only ]($read_only_style))'
 truncation_length = 3
 truncation_symbol = '…/'
 truncate_to_repo = true
+
+# The lock appears inside the segment when the directory is not writable,
+# like p10k's DIR_SHOW_WRITABLE.
+read_only = '󰌾'
+read_only_style = 'fg:dir_fg bg:dir_bg'
 
 # ── Git branch ─────────────────────────────────────────────────
 
@@ -86,7 +96,7 @@ only_attached = true
 always_show_remote = false
 
 symbol = ''
-format = '[](fg:dir_bg bg:git_bg)[ $symbol $branch(:$remote_branch)](fg:seg_fg bg:git_bg)'
+format = '[](fg:dir_bg bg:git_bg)[ $symbol $branch(:$remote_branch) ](fg:seg_fg bg:git_bg)'
 
 # Prevent unusually long branch names from taking over the prompt.
 truncation_length = 32
@@ -104,13 +114,13 @@ tag_disabled = false
 tag_max_candidates = 0
 tag_symbol = '  '
 
-format = '[](fg:dir_bg bg:git_bg)[  $hash$tag](fg:seg_fg bg:git_bg)'
+format = '[](fg:dir_bg bg:git_bg)[  $hash$tag ](fg:seg_fg bg:git_bg)'
 
 # ── Git operation in progress ──────────────────────────────────
 
 [git_state]
 # Show operations such as REBASE 3/10, MERGE or CHERRY-PICK.
-format = '[ $state( $progress_current/$progress_total)](bold fg:seg_fg bg:git_bg)'
+format = '[$state( $progress_current/$progress_total) ](bold fg:seg_fg bg:git_bg)'
 
 rebase = 'REBASE'
 merge = 'MERGE'
@@ -128,7 +138,7 @@ am_or_rebase = 'AM/REBASE'
 disabled = true
 only_nonzero_diffs = true
 
-format = '([ +$added]($added_style))([ -$deleted]($deleted_style))'
+format = '([+$added ]($added_style))([-$deleted ]($deleted_style))'
 added_style = 'fg:seg_fg bg:git_bg'
 deleted_style = 'fg:seg_fg bg:git_bg'
 
@@ -137,7 +147,7 @@ deleted_style = 'fg:seg_fg bg:git_bg'
 [git_status]
 # The entire group collapses when there is nothing to display.
 # Dirty or out-of-sync repositories get a yellow subsegment.
-format = '([](fg:git_bg bg:git_dirty_bg)[$all_status$ahead_behind](fg:seg_fg bg:git_dirty_bg))'
+format = '([](fg:git_bg bg:git_dirty_bg)[$all_status$ahead_behind ](fg:seg_fg bg:git_dirty_bg))'
 
 conflicted = ' =${count}'
 ahead = ' ⇡${count}'
@@ -163,9 +173,42 @@ vimcmd_symbol = '[❮](bold yellow)'
 
 # ── Right ──────────────────────────────────────────────────────
 
+[status]
+# Nothing on success; on failure the exit code, the signal name when one
+# killed the command (✘ 130 INT), and every member of a failed pipe
+# (✘ 0 |✘ 1). Replaces p10k's status segment, minus its ✔ on success.
+disabled = false
+format = '[$symbol$status( $signal_name) ]($style)'
+symbol = '✘ '
+success_symbol = ''
+not_executable_symbol = '✘ '
+not_found_symbol = '✘ '
+sigint_symbol = '✘ '
+signal_symbol = '✘ '
+map_symbol = true
+style = 'bold red'
+pipestatus = true
+pipestatus_separator = '|'
+pipestatus_format = '[$pipestatus]($style)'
+
 [cmd_duration]
 min_time = 500
 format = '[󰔛 $duration ]($style)'
+style = 'yellow'
+
+[jobs]
+# ✦ while something runs in the background, with the count from two jobs
+# up. Cyan like p10k's background_jobs icon.
+format = '[$symbol$number ]($style)'
+symbol = '✦'
+style = 'bold cyan'
+
+[direnv]
+# A chip whenever the directory carries an .envrc, yellow like p10k's
+# direnv segment.
+disabled = false
+format = '[$symbol ]($style)'
+symbol = 'direnv'
 style = 'yellow'
 
 [nodejs]
@@ -193,3 +236,16 @@ style = 'red'
 format = '[$symbol$version ]($style)'
 symbol = ' '
 style = 'cyan'
+
+# ── user@host, only when it matters ────────────────────────────
+# Hidden locally; user@host appears over SSH, red user when root.
+# Replaces p10k's context segment.
+
+[username]
+format = '[$user]($style)'
+style_user = 'bold yellow'
+style_root = 'bold red'
+
+[hostname]
+format = '[@$hostname]($style)'
+style = 'bold yellow'
