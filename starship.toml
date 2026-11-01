@@ -8,6 +8,10 @@
 # ───────────────────────────────────────────────────────────────
 
 add_newline = false
+
+# Default is 30 ms; a cold cache after boot takes longer and prints
+# "Scanning current directory timed out". 150 ms is unnoticeable.
+scan_timeout = 150
 palette = 'p10k'
 
 format = """
