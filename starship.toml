@@ -32,6 +32,7 @@ $direnv\
 $nodejs\
 $bun\
 $python\
+${custom.uv_python}\
 $rust\
 $golang\
 $username\
@@ -230,6 +231,20 @@ style = 'white'
 format = '[$symbol$version( \($virtualenv\)) ]($style)'
 symbol = ' '
 style = 'yellow'
+
+[custom.uv_python]
+# Optional: show the Python uv would use in this directory. Needs uv.
+# To enable, set this to false and add `disabled = true` under [python].
+disabled = true
+command = 'uv python find --show-version --no-python-downloads'
+detect_files = [
+  '.python-version', 'Pipfile', '__init__.py', 'pyproject.toml',
+  'requirements.txt', 'setup.py', 'tox.ini',
+]
+detect_extensions = ['py', 'ipynb']
+symbol = ' '
+style = 'yellow'
+format = '[$symbol(v$output )]($style)'
 
 [rust]
 format = '[$symbol$version ]($style)'

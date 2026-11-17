@@ -37,6 +37,12 @@ per-pipe codes), command duration (over 500 ms), background jobs, a direnv
 chip, language versions — Node.js, Bun, Python (with the active virtualenv
 name), Rust, Go — and `user@host` on SSH or root sessions, hidden locally.
 
+Optional **uv chip**: the Python that [uv](https://docs.astral.sh/uv/) would
+use in the directory (from the project's `.venv` or `.python-version`)
+instead of the `python` on `PATH`. Enable it by setting
+`custom.uv_python.disabled = false` and `python.disabled = true`. It needs
+uv (tested with 0.13.0) and does not show the virtualenv name.
+
 | State | Screenshot |
 |---|---|
 | Clean repo | ![clean](screenshots/clean.png) |
