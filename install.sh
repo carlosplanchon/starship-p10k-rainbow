@@ -2,6 +2,7 @@
 # Installs the starship-p10k-rainbow preset to your Starship config path,
 # then checks its dependencies (git, starship, a Nerd Font) and prints the
 # exact install command for your system when something is missing.
+# With uv installed, it also turns on the preset's optional uv chip.
 # It never runs sudo and never installs system packages on its own.
 #
 # Pipe it:
@@ -25,6 +26,7 @@ for arg in "$@"; do
       say ''
       say 'Installs the preset to your Starship config path and reports any'
       say 'missing dependency with the install command for your system.'
+      say 'With uv installed, it also turns on the optional uv chip.'
       say ''
       say '  --install-starship  also run the official starship installer'
       say '                      (no sudo: installs into ~/.local/bin)'
@@ -52,14 +54,34 @@ fi
 
 # ---------- install the preset ----------
 
+# Turns on the optional uv chip in preset file $1; fails without touching it.
+enable_uv_chip() {
+  # Probed from / so that no project decides the answer.
+  (cd / && uv python find --show-version --no-python-downloads) >/dev/null 2>&1 || return 1
+  awk '
+    /^\[/ { section = $0 }
+    section == "[python]" && /^disabled *=/ { next }
+    section == "[custom.uv_python]" && /^disabled *=/ { $0 = "disabled = false"; uv++ }
+    { print }
+    $0 == "[python]" { print "disabled = true"; py++ }
+    END { exit !(uv == 1 && py == 1) }
+  ' "$1" > "$edit" || return 1
+  mv "$edit" "$1"
+}
+
 # Download to temp files; the real config is only touched on success.
-tmp=$(mktemp); inst=$(mktemp)
-trap 'rm -f "$tmp" "$inst"' EXIT
+tmp=$(mktemp); inst=$(mktemp); edit=$(mktemp)
+trap 'rm -f "$tmp" "$inst" "$edit"' EXIT
 fetch "$RAW_TOML" "$tmp"
 grep -q 'starship.rs/config-schema' "$tmp" || {
   say 'error: downloaded file does not look like the preset; aborting.' >&2
   exit 1
 }
+
+UV_CHIP=none
+if command -v uv >/dev/null 2>&1; then
+  if enable_uv_chip "$tmp"; then UV_CHIP=on; else UV_CHIP=off; fi
+fi
 
 # Timestamped backup: never clobbers a previous one.
 if [ -f "$CONFIG" ]; then
@@ -72,6 +94,11 @@ mkdir -p "$(dirname "$CONFIG")"
 chmod 644 "$tmp"
 mv "$tmp" "$CONFIG"
 say "preset installed at: $CONFIG"
+case $UV_CHIP in
+  on)  say 'uv found: uv chip turned on, so the Python chip shows the version uv would use.'
+       say '  to undo: swap the "disabled" values under [python] and [custom.uv_python].' ;;
+  off) say 'note: uv found, but its chip could not be turned on; see the README.' ;;
+esac
 
 # ---------- dependency report ----------
 

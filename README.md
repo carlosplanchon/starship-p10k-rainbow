@@ -39,9 +39,10 @@ name), Rust, Go — and `user@host` on SSH or root sessions, hidden locally.
 
 Optional **uv chip**: the Python that [uv](https://docs.astral.sh/uv/) would
 use in the directory (from the project's `.venv` or `.python-version`)
-instead of the `python` on `PATH`. Enable it by setting
-`custom.uv_python.disabled = false` and `python.disabled = true`. It needs
-uv (tested with 0.13.0) and does not show the virtualenv name.
+instead of the `python` on `PATH`. The install script turns it on when it
+finds a working uv; by hand, set `custom.uv_python.disabled = false` and
+`python.disabled = true` (swap them back for the stock chip). It needs uv
+(tested with 0.13.0) and does not show the virtualenv name.
 
 | State | Screenshot |
 |---|---|
@@ -74,6 +75,7 @@ curl -sS https://raw.githubusercontent.com/carlosplanchon/starship-p10k-rainbow/
 
 The script also checks every dependency above and prints the install command
 for your system when something is missing; it never runs sudo on its own.
+With uv installed, it also turns on the uv chip in the copy it installs.
 Add `--install-starship` (piped: `| sh -s -- --install-starship`) to also
 install Starship via its official installer, without sudo, into `~/.local/bin`.
 
